@@ -1,0 +1,77 @@
+/* ===== Ask Page Layout ===== */
+
+.ask-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.ask-card {
+  width: min(820px, 94vw);
+  padding: 28px;
+  border-radius: 24px;
+  text-align: center;
+  z-index: 2;
+}
+
+.ask-photo {
+  width: 100%;
+  height: 340px;
+  object-fit: cover;
+  border-radius: 20px;
+  margin-bottom: 18px;
+}
+
+.ask-title {
+  font-size: clamp(28px, 4vw, 44px);
+  margin: 8px 0;
+}
+
+.ask-subtitle {
+  color: rgba(255,255,255,0.7);
+  margin-bottom: 22px;
+}
+
+/* ===== Buttons ===== */
+
+.ask-actions {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 10px;
+}
+
+.ask-no-fixed {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 999;
+}
+
+/* ===== Plea text ===== */
+
+.ask-plea {
+  margin-top: 18px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+/* ===== Celebration ===== */
+
+.confetti {
+  position: fixed;
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  background: linear-gradient(135deg, #ff4fa3, #ffd36a);
+  z-index: 1000;
+}
+
+.heart {
+  position: fixed;
+  font-size: 28px;
+  z-index: 1000;
+}

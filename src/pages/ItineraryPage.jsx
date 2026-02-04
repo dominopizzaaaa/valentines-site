@@ -17,7 +17,7 @@ const defaultItems = [
     id: "2",
     time: "7:30",
     title: "Blanco Court prawn mee",
-    note: "the one I tried and near your house!",
+    note: "the one near your house!",
     image: "/prawn.png",
   },
   {

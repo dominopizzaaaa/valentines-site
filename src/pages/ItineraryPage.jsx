@@ -21,6 +21,13 @@ const defaultItems = [
     image: "/prawn.png",
   },
   {
+    id: "2.5",
+    time: "9:00",
+    title: "Intervals 🏃‍♀️",
+    note: "burn some calories before we eat again hehe",
+    image: "/intervals.jpg",
+  },
+  {
     id: "3",
     time: "9:30",
     title: "Nap @ ur hse!",

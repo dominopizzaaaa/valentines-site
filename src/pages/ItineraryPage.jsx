@@ -8,7 +8,7 @@ const STORAGE_KEY = "valentine_itinerary_v2";
 const defaultItems = [
   {
     id: "1",
-    time: "5:00",
+    time: "6:00",
     title: "Sunrise cycle!",
     note: "what we wanted to do! You ride my bicycle, I ride a rental one hehe",
     image: "/cycle.png",
@@ -30,33 +30,26 @@ const defaultItems = [
   {
     id: "4",
     time: "12:30",
-    title: "Amazing carrot cake lunch",
-    note: "open to suggestions here hehe",
-    image: "/carrot-cake.jpg",
+    title: "Tamoya lunch",
+    note: "free bc of u yay!",
+    image: "/tamoya.jpg",
   },
   {
     id: "5",
-    time: "13:00",
-    title: "Massage time",
-    note: "you deserve it!",
-    image: "/massage.jpg",
-  },
-  {
-    id: "6",
     time: "16:30",
     title: "UltraGolf @ Sentosa",
     note: "hopefully not too hot at that time",
     image: "/golf.jpg",
   },
   {
-    id: "7",
+    id: "6",
     time: "18:30",
     title: "Dinner @ Ristorante Luka",
     note: "i think you will like it hehe",
     image: "/luka.png",
   },
   {
-    id: "8",
+    id: "7",
     time: "20:30",
     title: "Movie time @ ur hse (?)",
     note: "we can adjust this as you like",

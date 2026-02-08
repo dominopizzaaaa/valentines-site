@@ -13,9 +13,9 @@
 /* Grid */
 .occasion-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(3, 1fr); /* 👈 FORCE 3 PER ROW */
   gap: 32px;
-  max-width: 1200px;
+  max-width: 1100px; /* keeps cards nicely sized */
   margin: 0 auto;
 }
 

@@ -6,10 +6,12 @@ import ItineraryPage from "./pages/ItineraryPage.jsx";
 import NotFound from "./pages/NotFound.jsx";
 import TooEarly from "./pages/TooEarly.jsx";
 import MusicPlayer from "./components/MusicPlayer.jsx";
+import Fireflies from "./components/Fireflies.jsx";
 
 export default function App() {
   return (
     <div className="app-shell">
+      <Fireflies />
       <MusicPlayer />
 
       <Routes>

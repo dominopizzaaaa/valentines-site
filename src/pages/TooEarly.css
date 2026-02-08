@@ -1,0 +1,183 @@
+/* src/pages/TooEarly.css */
+
+.tooearly-page {
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  padding: 28px 16px;
+}
+
+/* soft base */
+.tooearly-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(900px 600px at 20% 20%, rgba(255, 79, 163, 0.18), transparent 65%),
+    radial-gradient(900px 650px at 80% 30%, rgba(155, 89, 255, 0.16), transparent 65%);
+  filter: blur(10px);
+  opacity: 0.95;
+  pointer-events: none;
+}
+
+/* aurora ribbons */
+.aurora {
+  position: absolute;
+  width: 70vmax;
+  height: 70vmax;
+  border-radius: 999px;
+  filter: blur(40px);
+  opacity: 0.42;
+  pointer-events: none;
+}
+
+.aurora.a1 {
+  left: -18vmax;
+  top: -12vmax;
+  background: radial-gradient(circle at 30% 30%, rgba(255, 79, 163, 0.35), transparent 60%),
+              radial-gradient(circle at 70% 60%, rgba(120, 190, 255, 0.20), transparent 55%);
+}
+
+.aurora.a2 {
+  right: -22vmax;
+  bottom: -14vmax;
+  background: radial-gradient(circle at 30% 30%, rgba(155, 89, 255, 0.32), transparent 60%),
+              radial-gradient(circle at 70% 60%, rgba(255, 214, 140, 0.18), transparent 55%);
+}
+
+/* stars */
+.star {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 16px rgba(255, 255, 255, 0.35);
+  pointer-events: none;
+}
+
+/* fireflies */
+.firefly {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(255, 240, 200, 0.95), rgba(255, 240, 200, 0.0) 70%);
+  box-shadow: 0 0 18px rgba(255, 220, 160, 0.35);
+  pointer-events: none;
+}
+
+/* main card */
+.tooearly-card {
+  width: min(760px, 94vw);
+  border-radius: 26px;
+  padding: 26px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* subtle shimmer edge */
+.tooearly-card::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.06),
+    rgba(255, 255, 255, 0.02),
+    rgba(255, 255, 255, 0.07)
+  );
+  opacity: 0.55;
+  filter: blur(10px);
+  pointer-events: none;
+}
+
+/* layout */
+.tooearly-top {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+}
+
+.hourglass-wrap {
+  position: relative;
+  width: 92px;
+  height: 92px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.10);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.hourglass {
+  font-size: 44px;
+  filter: drop-shadow(0 16px 30px rgba(0,0,0,0.25));
+}
+
+/* falling sand dots */
+.sand {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(255, 214, 140, 0.95);
+  top: 42px;
+  left: 45px;
+  box-shadow: 0 0 14px rgba(255, 214, 140, 0.35);
+  opacity: 0;
+}
+.sand.s2 {
+  left: 50px;
+  width: 4px;
+  height: 4px;
+  opacity: 0;
+}
+
+.tooearly-headlines {
+  text-align: left;
+}
+
+.tooearly-title {
+  margin: 0;
+  font-size: clamp(26px, 3.4vw, 42px);
+  letter-spacing: -0.02em;
+}
+
+.tooearly-sub {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 15.5px;
+  line-height: 1.45;
+}
+
+.tooearly-actions {
+  margin-top: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.tooearly-hint {
+  color: rgba(255, 255, 255, 0.58);
+  font-size: 12.5px;
+}
+
+body.day .tooearly-hint {
+  color: rgba(20, 20, 40, 0.55);
+}
+
+/* mobile */
+@media (max-width: 560px) {
+  .tooearly-top {
+    flex-direction: column;
+    text-align: center;
+  }
+  .tooearly-headlines {
+    text-align: center;
+  }
+}
+

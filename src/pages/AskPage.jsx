@@ -54,7 +54,7 @@ export default function AskPage() {
   function handleYes() {
     setCelebrate(true);
     setTimeout(() => {
-      navigate("/itinerary");
+      navigate("/1stvalentines/itinerary");
     }, 1800);
   }
 

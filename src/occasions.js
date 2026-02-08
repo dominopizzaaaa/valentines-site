@@ -5,11 +5,13 @@ const MAX_YEARS = 80;
 
 const ANNIVERSARY_MONTH_DAY = "12-04";
 const VALENTINES_MONTH_DAY = "02-14";
-const BIRTHDAY_MONTH_DAY = "10-26";
+const ASHLEY_BIRTHDAY_MONTH_DAY = "10-26";
+const DOMINIC_BIRTHDAY_MONTH_DAY = "05-23";
 
 /* Ashley birthday specifics */
 const ASHLEY_BIRTH_YEAR = 2002; // 26 Oct 2002 → 24 in 2026
 const ASHLEY_NAME = "Ashley";
+const DOMINIC_NAME = "Dominic";
 
 export const occasions = Array.from({ length: MAX_YEARS }, (_, i) => {
   const n = i + 1;
@@ -34,13 +36,23 @@ export const occasions = Array.from({ length: MAX_YEARS }, (_, i) => {
           : undefined
     },
 
+    /* 🎂 DOMINIC’S BIRTHDAY */{
+      id: `dominic-${birthdayAge}th-birthday`,
+      title: `${DOMINIC_NAME}’s ${birthdayAge}${ordinal(
+        birthdayAge
+      )} Birthday 🎂`,
+      date: `${year}-${DOMINIC_BIRTHDAY_MONTH_DAY}`,
+      emoji: "🎂",
+      image: `/birthday-${birthdayAge}.jpg`
+    },
+
     /* 🎂 ASHLEY’S BIRTHDAY */
     {
       id: `ashley-${birthdayAge}th-birthday`,
       title: `${ASHLEY_NAME}’s ${birthdayAge}${ordinal(
         birthdayAge
       )} Birthday 🎂`,
-      date: `${year}-${BIRTHDAY_MONTH_DAY}`,
+      date: `${year}-${ASHLEY_BIRTHDAY_MONTH_DAY}`,
       emoji: "🎂",
       image: `/birthday-${birthdayAge}.jpg`
     },

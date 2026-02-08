@@ -43,7 +43,7 @@ export const occasions = Array.from({ length: MAX_YEARS }, (_, i) => {
       )} Birthday 🎂`,
       date: `${year}-${DOMINIC_BIRTHDAY_MONTH_DAY}`,
       emoji: "🎂",
-      image: `/birthday-${birthdayAge}.jpg`
+      image: `/dominic-birthday-${birthdayAge}.jpg`
     },
 
     /* 🎂 ASHLEY’S BIRTHDAY */
@@ -54,7 +54,7 @@ export const occasions = Array.from({ length: MAX_YEARS }, (_, i) => {
       )} Birthday 🎂`,
       date: `${year}-${ASHLEY_BIRTHDAY_MONTH_DAY}`,
       emoji: "🎂",
-      image: `/birthday-${birthdayAge}.jpg`
+      image: `/ashley-birthday-${birthdayAge}.jpg`
     },
 
     /* 🌹 ANNIVERSARY */
@@ -68,7 +68,7 @@ export const occasions = Array.from({ length: MAX_YEARS }, (_, i) => {
 
     
   ];
-}).flat();
+}).flat().sort((a, b) => new Date(a.date) - new Date(b.date));;
 
 /* ---------- HELPERS ---------- */
 

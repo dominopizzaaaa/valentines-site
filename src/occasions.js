@@ -34,15 +34,6 @@ export const occasions = Array.from({ length: MAX_YEARS }, (_, i) => {
           : undefined
     },
 
-    /* 🌹 ANNIVERSARY */
-    {
-      id: `${n}thanniversary`,
-      title: `${n}${ordinal(n)} Anniversary 🌹`,
-      date: `${year}-${ANNIVERSARY_MONTH_DAY}`,
-      emoji: "🌹",
-      image: `/anniversary-${n}.jpg`
-    },
-
     /* 🎂 ASHLEY’S BIRTHDAY */
     {
       id: `ashley-${birthdayAge}th-birthday`,
@@ -52,7 +43,18 @@ export const occasions = Array.from({ length: MAX_YEARS }, (_, i) => {
       date: `${year}-${BIRTHDAY_MONTH_DAY}`,
       emoji: "🎂",
       image: `/birthday-${birthdayAge}.jpg`
+    },
+
+    /* 🌹 ANNIVERSARY */
+    {
+      id: `${n}thanniversary`,
+      title: `${n}${ordinal(n)} Anniversary 🌹`,
+      date: `${year}-${ANNIVERSARY_MONTH_DAY}`,
+      emoji: "🌹",
+      image: `/anniversary-${n}.jpg`
     }
+
+    
   ];
 }).flat();
 

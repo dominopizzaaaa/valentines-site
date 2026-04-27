@@ -3,87 +3,90 @@ import { occasions, isUnlocked } from "../occasions";
 import { useState } from "react";
 import "./HomePage.css";
 
-/* ---------- EMOJI SYSTEM ---------- */
+const EMOJI_SETS = [
+  { max: 3,  emojis: ["💘", "🥺", "🌷"] },
+  { max: 7,  emojis: ["💞", "🌸", "✨"] },
+  { max: 15, emojis: ["❤️‍🔥", "🌹", "💫"] },
+  { max: 30, emojis: ["💍", "🕊️", "🌺"] },
+  { max: 50, emojis: ["🌳", "🧿", "🪷"] },
+  { max: 80, emojis: ["♾️", "🌌", "🌠"] },
+];
 
-function getOccasionEmoji(id) {
-  const year = parseInt(id.match(/\d+/)?.[0] || "1", 10);
+function cardEmoji(id) {
+  const year = parseInt(id.match(/\d+/)?.[0] ?? "1", 10);
   const isValentines = id.includes("valentines");
-
-  const emojiSets = [
-    { max: 3, emojis: ["💘", "🥺", "🌷"] },
-    { max: 7, emojis: ["💞", "🌸", "✨"] },
-    { max: 15, emojis: ["❤️‍🔥", "🌹", "💫"] },
-    { max: 30, emojis: ["💍", "🕊️", "🌺"] },
-    { max: 50, emojis: ["🌳", "🧿", "🪷"] },
-    { max: 80, emojis: ["♾️", "🌌", "🌠"] }
-  ];
-
-  const set =
-    emojiSets.find((s) => year <= s.max) ??
-    emojiSets[emojiSets.length - 1];
-
-  // deterministic but varied
-  const index = (year + (isValentines ? 1 : 2)) % set.emojis.length;
-  return set.emojis[index];
+  const set = EMOJI_SETS.find((s) => year <= s.max) ?? EMOJI_SETS.at(-1);
+  return set.emojis[(year + (isValentines ? 1 : 2)) % set.emojis.length];
 }
 
-/* ---------- CARD ---------- */
+function formatDate(dateStr) {
+  const d = new Date(dateStr + "T00:00:00");
+  return d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+}
 
 function OccasionCard({ o }) {
   const navigate = useNavigate();
   const unlocked = isUnlocked(o.date);
+  const [imgError, setImgError] = useState(false);
+  const hasImg = o.image && !imgError;
+  const emoji = cardEmoji(o.id);
 
-  const [imageError, setImageError] = useState(false);
-  const hasImage = o.image && !imageError;
-
-  const emoji = getOccasionEmoji(o.id);
+  function handleClick() {
+    if (unlocked && o.routes?.ask) {
+      navigate(o.routes.ask);
+    } else {
+      navigate("/early");
+    }
+  }
 
   return (
     <div
-      className={`occasion-card glass ${
-        unlocked ? "unlocked" : "locked"
-      } ${!hasImage ? "no-image" : ""}`}
-      onClick={() => {
-        if (unlocked && o.routes?.ask) {
-          navigate(o.routes.ask);
-        } else {
-          navigate("/early");
-        }
-      }}
+      className={`oc-card glass ${unlocked ? "unlocked" : "locked"}`}
+      onClick={handleClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => e.key === "Enter" && handleClick()}
     >
-      {/* IMAGE */}
-      {hasImage && (
-        <div className="occasion-media">
+      {/* Lock badge */}
+      {!unlocked && <div className="oc-lock">🔒</div>}
+
+      {/* Image */}
+      {hasImg ? (
+        <div className="oc-img-wrap">
           <img
             src={o.image}
             alt={o.title}
-            className="occasion-image"
-            onError={() => setImageError(true)}
+            className="oc-img"
+            onError={() => setImgError(true)}
           />
+          <div className="oc-img-fade" />
         </div>
+      ) : (
+        <div className="oc-emoji-hero">{emoji}</div>
       )}
 
-      {/* CONTENT */}
-      <div className="occasion-content">
-        <div className="occasion-emoji">{emoji}</div>
-        <h3 className="occasion-title">{o.title}</h3>
-        <p className="occasion-date">{o.date}</p>
+      {/* Info */}
+      <div className="oc-info">
+        {hasImg && <div className="oc-emoji-small">{emoji}</div>}
+        <p className="oc-title">{o.title}</p>
+        <p className="oc-date">{formatDate(o.date)}</p>
       </div>
 
-      {/* SOFT GLOW */}
-      {unlocked && <div className="hover-glow" />}
+      {/* Hover glow */}
+      {unlocked && <div className="oc-glow" />}
     </div>
   );
 }
 
-/* ---------- PAGE ---------- */
-
 export default function HomePage() {
   return (
     <div className="home-page">
-      <h1 className="home-title">our moments ✨</h1>
+      <div className="home-hero">
+        <h1 className="home-title">our moments</h1>
+        <p className="home-sub">every one, forever ✨</p>
+      </div>
 
-      <div className="occasion-grid">
+      <div className="oc-grid">
         {occasions.map((o) => (
           <OccasionCard key={o.id} o={o} />
         ))}

@@ -1,47 +1,74 @@
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import "./AskPage.css";
 
+const MAX_NO = 5;
+
+const NO_LINES = [
+  "pls say yes! 🥺",
+  "wait why you press no",
+  "what are you doing",
+  "u rly dont want to be my valentine?",
+  "one more time and im not gonna give u an option anymore.",
+];
+
+function CelebrationParticles() {
+  const particles = useMemo(() => Array.from({ length: 32 }, (_, i) => ({
+    id: i,
+    x: (Math.random() - 0.5) * window.innerWidth * 1.4,
+    y: (Math.random() - 0.5) * window.innerHeight * 1.4,
+    isHeart: i < 14,
+    rotate: Math.random() * 360,
+    scale: 0.6 + Math.random() * 0.8,
+    delay: Math.random() * 0.4,
+  })), []);
+
+  return (
+    <>
+      {particles.map((p) =>
+        p.isHeart ? (
+          <motion.div
+            key={`h-${p.id}`}
+            className="celebration-heart"
+            initial={{ x: 0, y: 0, opacity: 1, scale: p.scale }}
+            animate={{ x: p.x, y: p.y, opacity: 0, scale: p.scale * 1.3 }}
+            transition={{ duration: 1.8, ease: "easeOut", delay: p.delay }}
+          >
+            💖
+          </motion.div>
+        ) : (
+          <motion.div
+            key={`c-${p.id}`}
+            className="celebration-confetti"
+            initial={{ x: 0, y: 0, opacity: 1, rotate: 0 }}
+            animate={{ x: p.x, y: p.y, opacity: 0, rotate: p.rotate }}
+            transition={{ duration: 1.2, ease: "easeOut", delay: p.delay }}
+          />
+        )
+      )}
+    </>
+  );
+}
+
 export default function AskPage() {
   const navigate = useNavigate();
-
-  // CONFIG
-  const MAX_NO = 5;
-
-  // Subtitle text that changes on each NO
-  const subtitleTexts = [
-    "pls say yes! 🥺",
-    "wait why you press no",
-    "what are you doing",
-    "u rly dont want to be my valentine?",
-    "one more time and im not gonna give u an option anymore."
-  ];
-
   const [noCount, setNoCount] = useState(0);
   const [escaped, setEscaped] = useState(false);
   const [noPos, setNoPos] = useState({ x: 0, y: 0 });
   const [celebrate, setCelebrate] = useState(false);
 
   const noGone = noCount >= MAX_NO;
-
-  const subtitle =
-    subtitleTexts[Math.min(noCount, subtitleTexts.length - 1)];
-
-  const noScale = useMemo(() => {
-    return Math.max(0.4, 1 - noCount * 0.12);
-  }, [noCount]);
+  const subtitle = NO_LINES[Math.min(noCount, NO_LINES.length - 1)];
+  const noScale = Math.max(0.35, 1 - noCount * 0.13);
 
   function moveNoButton() {
-    const padding = 20;
-    const btnSize = 140;
-
-    const maxX = window.innerWidth - btnSize - padding;
-    const maxY = window.innerHeight - btnSize - padding;
-
+    const pad = 24;
+    const btnW = 130;
+    const btnH = 52;
     setNoPos({
-      x: Math.random() * maxX + padding,
-      y: Math.random() * maxY + padding
+      x: pad + Math.random() * (window.innerWidth - btnW - pad * 2),
+      y: pad + Math.random() * (window.innerHeight - btnH - pad * 2),
     });
   }
 
@@ -53,114 +80,100 @@ export default function AskPage() {
 
   function handleYes() {
     setCelebrate(true);
-    setTimeout(() => {
-      navigate("/1stvalentines/itinerary");
-    }, 1800);
+    setTimeout(() => navigate("/1stvalentines/itinerary"), 1800);
   }
 
   return (
     <div className="ask-page">
-      <div className="bg-glow" />
-
-      {/* 🎉 Confetti + Hearts */}
+      {/* Celebration burst */}
       <AnimatePresence>
         {celebrate && (
-          <>
-            {Array.from({ length: 30 }).map((_, i) => (
-              <motion.div
-                key={`confetti-${i}`}
-                className="confetti"
-                initial={{
-                  x: window.innerWidth / 2,
-                  y: window.innerHeight / 2,
-                  opacity: 1
-                }}
-                animate={{
-                  x: Math.random() * window.innerWidth,
-                  y: Math.random() * window.innerHeight,
-                  opacity: 0
-                }}
-                transition={{ duration: 1, ease: "easeOut" }}
-              />
-            ))}
-
-            {Array.from({ length: 16 }).map((_, i) => (
-              <motion.div
-                key={`heart-${i}`}
-                className="heart"
-                initial={{
-                  x: window.innerWidth / 2,
-                  y: window.innerHeight / 2,
-                  opacity: 1
-                }}
-                animate={{
-                  x: Math.random() * window.innerWidth,
-                  y: Math.random() * window.innerHeight - 200,
-                  opacity: 0
-                }}
-                transition={{ duration: 1.8, ease: "easeOut" }}
-              >
-                💖
-              </motion.div>
-            ))}
-          </>
+          <div className="celebrate-origin">
+            <CelebrationParticles />
+          </div>
         )}
       </AnimatePresence>
 
       {/* Main card */}
-      <div className="ask-card glass">
-        <img src="/us.jpg" alt="Us" className="ask-photo" />
+      <motion.div
+        className="ask-card glass"
+        initial={{ opacity: 0, y: 24, scale: 0.97 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+      >
+        {/* Photo */}
+        <div className="ask-photo-wrap">
+          <img src="/us.jpg" alt="Us" className="ask-photo" />
+          <div className="ask-photo-shine" />
+        </div>
 
-        <h1 className="ask-title">hi poop! will u be my valentine?</h1>
+        {/* Text */}
+        <div className="ask-text">
+          <h1 className="ask-title">hi poop!</h1>
+          <p className="ask-question">will u be my valentine? 💘</p>
 
-        <motion.p
-          key={subtitle}
-          className="ask-subtitle"
-          initial={{ opacity: 0, y: 6 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-        >
-          {subtitle}
-        </motion.p>
+          <AnimatePresence mode="wait">
+            <motion.p
+              key={subtitle}
+              className="ask-subtitle"
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -5 }}
+              transition={{ duration: 0.25 }}
+            >
+              {subtitle}
+            </motion.p>
+          </AnimatePresence>
+        </div>
 
+        {/* Buttons */}
         <div className="ask-actions">
-          <button className="btn btn-primary" onClick={handleYes}>
-            Yes 💘
-          </button>
+          <motion.button
+            className="btn btn-primary ask-yes"
+            onClick={handleYes}
+            whileHover={{ scale: 1.06 }}
+            whileTap={{ scale: 0.96 }}
+          >
+            Yes, always 💘
+          </motion.button>
 
           {!escaped && !noGone && (
-            <button className="btn btn-danger" onClick={handleNo}>
+            <motion.button
+              className="btn btn-ghost ask-no-inline"
+              onClick={handleNo}
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.96 }}
+            >
               No
-            </button>
+            </motion.button>
           )}
         </div>
 
         {noGone && (
-          <motion.div
+          <motion.p
             className="ask-plea"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
           >
             just say yes poopie 🥺
-          </motion.div>
+          </motion.p>
         )}
-      </div>
+      </motion.div>
 
-      {/* Escaped NO button (always says "No") */}
-      {escaped && !noGone && (
-        <motion.button
-          className="btn btn-danger ask-no-fixed"
-          onClick={handleNo}
-          animate={{
-            x: noPos.x,
-            y: noPos.y,
-            scale: noScale
-          }}
-          transition={{ type: "spring", stiffness: 500, damping: 20 }}
-        >
-          No
-        </motion.button>
-      )}
+      {/* Escaped NO button */}
+      <AnimatePresence>
+        {escaped && !noGone && (
+          <motion.button
+            className="btn btn-ghost ask-no-floating"
+            onClick={handleNo}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1, x: noPos.x, y: noPos.y, scale: noScale }}
+            transition={{ type: "spring", stiffness: 480, damping: 22 }}
+          >
+            No
+          </motion.button>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

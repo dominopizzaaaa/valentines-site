@@ -1,225 +1,265 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { itinerary1stValentines } from "../data/itinerary-1stvalentines";
 import "./ItineraryPage.css";
 
 const STORAGE_KEY = "valentine_itinerary_v2";
 
-const defaultItems = [
-  {
-    id: "1",
-    time: "6:00",
-    title: "Sunrise cycle!",
-    note: "what we wanted to do! You ride my bicycle, I ride a rental one hehe",
-    image: "/cycle.png",
-  },
-  {
-    id: "2",
-    time: "7:30",
-    title: "Blanco Court prawn mee",
-    note: "the one near your house!",
-    image: "/prawn.png",
-  },
-  {
-    id: "2.5",
-    time: "9:00",
-    title: "Intervals 🏃‍♀️",
-    note: "burn some calories before we eat again hehe",
-    image: "/intervals.jpg",
-  },
-  {
-    id: "3",
-    time: "9:30",
-    title: "Nap @ ur hse!",
-    note: "we defo need some sleep 😴",
-    image: "/sleep.jpg",
-  },
-  {
-    id: "4",
-    time: "12:30",
-    title: "Tamoya lunch",
-    note: "free bc of u yay!",
-    image: "/tamoya.jpg",
-  },
-  {
-    id: "5",
-    time: "16:30",
-    title: "UltraGolf @ Sentosa",
-    note: "hopefully not too hot at that time",
-    image: "/golf.jpg",
-  },
-  {
-    id: "6",
-    time: "18:30",
-    title: "Dinner @ Ristorante Luka",
-    note: "i think you will like it hehe",
-    image: "/luka.png",
-  },
-  {
-    id: "7",
-    time: "20:30",
-    title: "Movie time @ ur hse (?)",
-    note: "we can adjust this as you like",
-    image: "/movie.jpg",
-  },
-];
+/* ─── helpers ─── */
 
 function loadItems() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return defaultItems;
+    if (!raw) return itinerary1stValentines;
     const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return defaultItems;
-    return parsed;
+    return Array.isArray(parsed) ? parsed : itinerary1stValentines;
   } catch {
-    return defaultItems;
+    return itinerary1stValentines;
   }
 }
 
-const toMinutes = (t) => {
+function toMinutes(t) {
   if (!t) return 0;
   const [h, m] = t.split(":").map(Number);
   return h * 60 + m;
-};
+}
 
-const dayPartLabel = (time) => {
-  const mins = toMinutes(time);
-  if (mins < 12 * 60) return "Morning";
-  if (mins < 17 * 60) return "Afternoon";
+function dayPart(time) {
+  const m = toMinutes(time);
+  if (m < 12 * 60) return "Morning";
+  if (m < 17 * 60) return "Afternoon";
   return "Evening";
-};
+}
+
+function buildTimeline(items) {
+  const sorted = [...items].sort((a, b) => toMinutes(a.time) - toMinutes(b.time));
+  const blocks = [];
+  let lastPart = null;
+  for (const item of sorted) {
+    const part = dayPart(item.time);
+    if (part !== lastPart) {
+      blocks.push({ type: "sep", id: `sep-${part}`, label: part });
+      lastPart = part;
+    }
+    blocks.push({ type: "item", id: item.id, item });
+  }
+  return blocks;
+}
+
+/* ─── sub-components ─── */
+
+function Lightbox({ src, title, onClose }) {
+  return createPortal(
+    <AnimatePresence>
+      {src && (
+        <motion.div
+          className="lb-backdrop"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={onClose}
+        >
+          <motion.div
+            className="lb-card"
+            initial={{ scale: 0.96, y: 12, opacity: 0 }}
+            animate={{ scale: 1, y: 0, opacity: 1 }}
+            exit={{ scale: 0.96, y: 12, opacity: 0 }}
+            transition={{ duration: 0.18 }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="lb-header">
+              <span className="lb-title">{title}</span>
+              <button className="lb-close" onClick={onClose}>✕</button>
+            </div>
+            <img className="lb-img" src={src} alt={title} />
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>,
+    document.body
+  );
+}
+
+function EventCard({ item, onDelete, onZoom }) {
+  return (
+    <motion.div
+      className="ev-row"
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.2 }}
+    >
+      <div className="ev-time">{item.time}</div>
+
+      <div className="ev-card">
+        {item.image ? (
+          <button
+            className="ev-img-btn"
+            onClick={() => onZoom(item.image, item.title)}
+            aria-label="Preview image"
+          >
+            <div
+              className="ev-img-bg"
+              style={{ backgroundImage: `url(${item.image})` }}
+            />
+            <img
+              className="ev-img"
+              src={item.image}
+              alt={item.title}
+              loading="lazy"
+            />
+            <div className="ev-zoom-hint">🔍</div>
+          </button>
+        ) : (
+          <div className="ev-no-img">📷</div>
+        )}
+
+        <div className="ev-body">
+          <p className="ev-title">{item.title}</p>
+          {item.note && <p className="ev-note">{item.note}</p>}
+          <button
+            className="ev-delete"
+            onClick={() => onDelete(item.id)}
+            aria-label="Delete"
+          >
+            ✕
+          </button>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+function AddEventForm({ onAdd, onClose }) {
+  const [time, setTime] = useState("12:00");
+  const [title, setTitle] = useState("");
+  const [note, setNote] = useState("");
+
+  function submit() {
+    const t = title.trim();
+    if (!t) return;
+    onAdd({ id: String(Date.now()), time, title: t, note: note.trim(), image: null });
+    setTitle("");
+    setNote("");
+  }
+
+  return (
+    <div className="add-panel">
+      <h2 className="add-panel-title">Add an event</h2>
+
+      <div className="add-grid">
+        <div className="add-field">
+          <label className="add-label">Time</label>
+          <input
+            className="add-input"
+            type="time"
+            value={time}
+            onChange={(e) => setTime(e.target.value)}
+          />
+        </div>
+
+        <div className="add-field">
+          <label className="add-label">Title</label>
+          <input
+            className="add-input"
+            placeholder="e.g., Bubble tea"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && submit()}
+          />
+        </div>
+
+        <div className="add-field add-full">
+          <label className="add-label">Note</label>
+          <input
+            className="add-input"
+            placeholder="optional note..."
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && submit()}
+          />
+        </div>
+      </div>
+
+      <div className="add-actions">
+        <button className="btn btn-primary" onClick={submit}>Add</button>
+        <button className="btn btn-ghost" onClick={onClose}>Close envelope</button>
+      </div>
+    </div>
+  );
+}
+
+/* ─── main page ─── */
 
 export default function ItineraryPage() {
   const [revealed, setRevealed] = useState(false);
-  const [items, setItems] = useState(() => loadItems());
-
-  const [draftTime, setDraftTime] = useState("12:00");
-  const [draftTitle, setDraftTitle] = useState("");
-  const [draftNote, setDraftNote] = useState("");
-  const [draftImage, setDraftImage] = useState("");
-
-  const [lightbox, setLightbox] = useState(null); // { src, title } | null
+  const [items, setItems] = useState(loadItems);
+  const [lightbox, setLightbox] = useState(null);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
   }, [items]);
 
-  const sortedItems = useMemo(() => {
-    return [...items].sort((a, b) => toMinutes(a.time) - toMinutes(b.time));
-  }, [items]);
+  const timeline = useMemo(() => buildTimeline(items), [items]);
 
-  // Insert "Morning/Afternoon/Evening" separators automatically
-  const timelineBlocks = useMemo(() => {
-    const blocks = [];
-    let lastPart = null;
+  function addItem(item) {
+    setItems((prev) => [...prev, item]);
+  }
 
-    for (const it of sortedItems) {
-      const part = dayPartLabel(it.time);
-      if (part !== lastPart) {
-        blocks.push({ type: "separator", id: `sep-${part}`, label: part });
-        lastPart = part;
-      }
-      blocks.push({ type: "item", id: it.id, item: it });
-    }
-
-    return blocks;
-  }, [sortedItems]);
-
-  const addItem = () => {
-    const title = draftTitle.trim();
-    if (!title) return;
-
-    const id = String(Date.now());
-    const img = draftImage.trim();
-
-    setItems((prev) => [
-      ...prev,
-      {
-        id,
-        time: draftTime,
-        title,
-        note: draftNote.trim(),
-        image: img ? img : null,
-      },
-    ]);
-
-    setDraftTitle("");
-    setDraftNote("");
-    setDraftImage("");
-  };
-
-  const removeItem = (id) => {
+  function removeItem(id) {
     setItems((prev) => prev.filter((x) => x.id !== id));
-  };
-
-  const reset = () => {
-    setItems(defaultItems);
-  };
+  }
 
   return (
     <div className="it-page">
-      <div className="it-glow" />
-
-      <div className="it-shell card glass">
+      <div className="it-shell glass">
         {/* Header */}
-        <div className="it-head">
-          <div className="it-head-left">
+        <div className="it-header">
+          <div>
             <h1 className="it-title">14 Feb Itinerary</h1>
-            <p className="it-subtitle">
-              u can edit anything, u r the boss! ❤️
-            </p>
+            <p className="it-sub">u can edit anything, u r the boss! ❤️</p>
           </div>
-
-          <div className="it-head-actions">
-            <button className="btn btn-ghost" onClick={reset}>
+          <div className="it-header-actions">
+            <button className="btn btn-ghost btn-small" onClick={() => setItems(itinerary1stValentines)}>
               Reset
             </button>
-
-            {revealed ? (
-              <button className="btn btn-ghost" onClick={() => setRevealed(false)}>
-                Close envelope
-              </button>
-            ) : null}
           </div>
         </div>
 
         <AnimatePresence mode="wait">
           {!revealed ? (
-            /* ================= SEALED VIEW ================= */
+            /* ── SEALED ── */
             <motion.div
               key="sealed"
-              className="sealed-view"
-              initial={{ opacity: 0, y: 12 }}
+              className="sealed"
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -12 }}
-              transition={{ duration: 0.35 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3 }}
             >
-              <div className="cover-grid">
-                <div className="cover-copy">
-                  <div className="cover-pill">💌 Classified</div>
-                  <h2 className="cover-title">Open it!</h2>
-                  <p className="cover-desc">
-                    planned by me hehe
-                  </p>
+              <div className="sealed-grid">
+                <div className="sealed-copy">
+                  <span className="sealed-tag">💌 Classified</span>
+                  <h2 className="sealed-heading">Open it!</h2>
+                  <p className="sealed-desc">planned by me hehe</p>
                 </div>
-
-                <div className="cover-photo">
+                <div className="sealed-photo">
                   <div className="polaroid">
-                    <img src="/us2.jpg" alt="Us" className="cover-img" />
-                    <div className="polaroid-caption">🤍</div>
+                    <img src="/us2.jpg" alt="Us" className="polaroid-img" />
+                    <p className="polaroid-caption">🤍</p>
                   </div>
                 </div>
               </div>
 
               <motion.div
                 className="envelope"
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
+                whileHover={{ scale: 1.025 }}
+                whileTap={{ scale: 0.975 }}
               >
-                <div className="envelope-top" />
-                <div className="envelope-body">
-                  <div className="seal">💌</div>
-                  <div className="sealed-text">Tap to open your plan</div>
+                <div className="env-flap" />
+                <div className="env-body">
+                  <div className="env-seal">💌</div>
+                  <p className="env-text">Tap to open your plan</p>
                   <button className="btn btn-primary" onClick={() => setRevealed(true)}>
                     Open
                   </button>
@@ -227,171 +267,46 @@ export default function ItineraryPage() {
               </motion.div>
             </motion.div>
           ) : (
-            /* ================= OPEN VIEW ================= */
+            /* ── OPEN ── */
             <motion.div
               key="open"
-              className="open-view"
+              className="open"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.35 }}
+              transition={{ duration: 0.3 }}
             >
               <div className="timeline">
-                {timelineBlocks.map((b) => {
-                  if (b.type === "separator") {
-                    return (
-                      <div key={b.id} className="time-sep">
-                        <span className="time-sep-line" />
-                        <span className="time-sep-pill">{b.label}</span>
-                        <span className="time-sep-line" />
-                      </div>
-                    );
-                  }
-
-                  const item = b.item;
-
-                  return (
-                    <motion.div
+                {timeline.map((b) =>
+                  b.type === "sep" ? (
+                    <div key={b.id} className="tl-sep">
+                      <span className="tl-sep-line" />
+                      <span className="tl-sep-label">{b.label}</span>
+                      <span className="tl-sep-line" />
+                    </div>
+                  ) : (
+                    <EventCard
                       key={b.id}
-                      className="timeline-row"
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.22 }}
-                    >
-                      <div className="time-badge">{item.time}</div>
-
-                      <div className="event-card">
-                        <div
-                          className="media"
-                          style={
-                            item.image
-                              ? { "--img": `url(${item.image})` }
-                              : undefined
-                          }
-                        >
-                          {item.image ? (
-                            <button
-                              className="media-btn"
-                              onClick={() => setLightbox({ src: item.image, title: item.title })}
-                              aria-label="Open image preview"
-                            >
-                              <img
-                                src={item.image}
-                                alt={item.title}
-                                className="media-img"
-                                loading="lazy"
-                              />
-                              <div className="media-zoom">🔍</div>
-                            </button>
-                          ) : (
-                            <div className="media-placeholder">
-                              <div className="ph-icon">📷</div>
-                            </div>
-                          )}
-                        </div>
-
-                        <div className="event-body">
-                          <div className="event-title">{item.title}</div>
-                          <div className="event-note">{item.note}</div>
-
-                          <button
-                            className="delete"
-                            onClick={() => removeItem(item.id)}
-                            aria-label="Delete item"
-                            title="Delete"
-                          >
-                            ×
-                          </button>
-                        </div>
-                      </div>
-                    </motion.div>
-                  );
-                })}
+                      item={b.item}
+                      onDelete={removeItem}
+                      onZoom={(src, title) => setLightbox({ src, title })}
+                    />
+                  )
+                )}
               </div>
 
-              <div className="divider" />
+              <div className="it-divider" />
 
-              <div className="edit-panel">
-                <h2 className="section-title">Add your own event</h2>
-
-                <div className="form-grid">
-                  <div className="field">
-                    <label className="label">Time</label>
-                    <input
-                      className="input"
-                      type="time"
-                      value={draftTime}
-                      onChange={(e) => setDraftTime(e.target.value)}
-                    />
-                  </div>
-
-                  <div className="field">
-                    <label className="label">Title</label>
-                    <input
-                      className="input"
-                      placeholder="e.g., Bubble tea"
-                      value={draftTitle}
-                      onChange={(e) => setDraftTitle(e.target.value)}
-                    />
-                  </div>
-
-                  <div className="field span-2">
-                    <label className="label">Note</label>
-                    <input
-                      className="input"
-                      placeholder="e.g., your craving wins"
-                      value={draftNote}
-                      onChange={(e) => setDraftNote(e.target.value)}
-                    />
-                  </div>
-                </div>
-
-                <div className="form-actions">
-                  <button className="btn btn-primary" onClick={addItem}>
-                    Add
-                  </button>
-                  <button className="btn btn-ghost" onClick={() => setRevealed(false)}>
-                    Close envelope
-                  </button>
-                </div>
-              </div>
+              <AddEventForm onAdd={addItem} onClose={() => setRevealed(false)} />
             </motion.div>
           )}
         </AnimatePresence>
-
-        {/* Lightbox (portal to body so it centers in the viewport) */}
-        {createPortal(
-          <AnimatePresence>
-            {lightbox && (
-              <motion.div
-                className="lightbox"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                onClick={() => setLightbox(null)}
-              >
-                <motion.div
-                  className="lightbox-card"
-                  initial={{ scale: 0.98, y: 10, opacity: 0 }}
-                  animate={{ scale: 1, y: 0, opacity: 1 }}
-                  exit={{ scale: 0.98, y: 10, opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <div className="lightbox-top">
-                    <div className="lightbox-title">{lightbox.title}</div>
-                    <button className="lightbox-close" onClick={() => setLightbox(null)}>
-                      ×
-                    </button>
-                  </div>
-                  <img className="lightbox-img" src={lightbox.src} alt={lightbox.title} />
-                </motion.div>
-              </motion.div>
-            )}
-          </AnimatePresence>,
-          document.body
-        )}
-
       </div>
+
+      <Lightbox
+        src={lightbox?.src}
+        title={lightbox?.title}
+        onClose={() => setLightbox(null)}
+      />
     </div>
   );
 }

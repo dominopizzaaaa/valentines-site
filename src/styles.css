@@ -4,17 +4,17 @@
 
 :root {
   /* Night theme (default) */
-  --bg1: #0b1020;
-  --bg2: #1b0f1f;
+  --bg1: #0a0e1a;
+  --bg2: #180d1e;
 
-  --card: rgba(255, 255, 255, 0.09);
-  --card2: rgba(255, 255, 255, 0.14);
+  --card: rgba(255, 255, 255, 0.08);
+  --card2: rgba(255, 255, 255, 0.13);
 
   --text: rgba(255, 255, 255, 0.92);
-  --muted: rgba(255, 255, 255, 0.65);
-  --border: rgba(255, 255, 255, 0.18);
+  --muted: rgba(255, 255, 255, 0.58);
+  --border: rgba(255, 255, 255, 0.15);
 
-  --shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+  --shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
   --radius: 22px;
 
   --accent1: #ff4fa3;
@@ -58,8 +58,10 @@ body {
 
 body {
   margin: 0;
-  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
     Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 
   color: var(--text);
   background: var(--bg1);

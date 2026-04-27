@@ -1,0 +1,58 @@
+export const itinerary1stValentines = [
+  {
+    id: "1",
+    time: "6:00",
+    title: "Sunrise cycle!",
+    note: "what we wanted to do! You ride my bicycle, I ride a rental one hehe",
+    image: "/cycle.png",
+  },
+  {
+    id: "2",
+    time: "7:30",
+    title: "Blanco Court prawn mee",
+    note: "the one near your house!",
+    image: "/prawn.png",
+  },
+  {
+    id: "2.5",
+    time: "9:00",
+    title: "Intervals 🏃‍♀️",
+    note: "burn some calories before we eat again hehe",
+    image: "/intervals.jpg",
+  },
+  {
+    id: "3",
+    time: "9:30",
+    title: "Nap @ ur hse!",
+    note: "we defo need some sleep 😴",
+    image: "/sleep.jpg",
+  },
+  {
+    id: "4",
+    time: "12:30",
+    title: "Tamoya lunch",
+    note: "free bc of u yay!",
+    image: "/tamoya.jpg",
+  },
+  {
+    id: "5",
+    time: "16:30",
+    title: "UltraGolf @ Sentosa",
+    note: "hopefully not too hot at that time",
+    image: "/golf.jpg",
+  },
+  {
+    id: "6",
+    time: "18:30",
+    title: "Dinner @ Ristorante Luka",
+    note: "i think you will like it hehe",
+    image: "/luka.png",
+  },
+  {
+    id: "7",
+    time: "20:30",
+    title: "Movie time @ ur hse (?)",
+    note: "we can adjust this as you like",
+    image: "/movie.jpg",
+  },
+];
